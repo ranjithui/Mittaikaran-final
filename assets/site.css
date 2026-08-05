@@ -1,0 +1,859 @@
+:root {
+  /* Palette taken from the logo: deep crimson lettering + the rose of the
+     monogram, on white. --teal / --gold are kept as the token names the rest
+     of the stylesheets already speak; only their values changed. */
+  --teal: #8f1119;       /* deep crimson — nav, headings, dark bands */
+  --teal-dark: #6d0a11;
+  --gold: #c04854;       /* logo rose — accents, ribbons, dots */
+  --gold-dark: #a8303c;
+  --cream: #fdf7f7;      /* barely-tinted white for alternating sections */
+  --line: #f0e2e2;       /* hairline borders */
+  --head-tint: #faf0f1;  /* nav bar — the logo rose at ~8% over white */
+  /* Wallpaper pattern, shared by the page layer and the tinted bands. */
+  --wallpaper: url('../images/ui/wallpaper.png');
+  --wallpaper-size: 460px;
+  --wallpaper-opacity: .07;
+  --ink: #241f1f;
+  --muted: #6f6664;
+  --serif: 'Bree Serif', serif;
+  --sans: Helvetica, Arial, sans-serif;
+  /* First-paint value; measured for real at runtime by Header.jsx. Covers the
+     whole fixed head — announcement bar plus the expanded nav — so keep it near
+     that total or the page jumps when the measurement lands. */
+  --header-h: 126px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+/* Keep anchored headings clear of the sticky header. */
+section[id] { scroll-margin-top: calc(var(--header-h) + 16px); }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background: #fff;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Wallpaper behind the white parts of the page: a faint scattered pattern of
+   sweets, savouries and dry fruits. Body's own background propagates to the
+   canvas, which lets this pseudo-element sit above that white and below all
+   content. Fixed, so it stays put while the page scrolls over it. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--wallpaper) repeat;
+  background-size: var(--wallpaper-size);
+  opacity: var(--wallpaper-opacity);
+}
+
+
+img { max-width: 100%; display: block; }
+
+a { color: inherit; text-decoration: none; }
+
+button { font-family: inherit; cursor: pointer; }
+
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 400; margin: 0; }
+
+/* The measure every section aligns to. Wide enough to use a large display
+   without letting rows of cards stretch past a comfortable size. */
+.container { max-width: 1440px; margin: 0 auto; padding: 0 32px; }
+
+/* ---------- Section heading ---------- */
+.section-head { text-align: center; margin: 0 auto 34px; max-width: 720px; }
+.section-head h2 {
+  font-family: var(--serif);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 30px;
+  margin-bottom: 12px;
+  color: var(--gold);
+}
+/* Darker and heavier than the old --muted grey, which read as faint against
+   the white sections. */
+.section-head p { font-size: 15px; font-weight: 600; color: var(--ink); margin: 0; line-height: 1.6; }
+.on-teal .section-head p { color: rgba(255, 255, 255, .92); }
+.gold-head h2 { color: var(--gold); }
+.teal-head h2 { color: var(--teal); }
+
+/* ---------- Announcement bar ---------- */
+/* Scrolling offer ticker above the nav. */
+.announcement {
+  background: var(--teal);
+  color: #fff;
+  font-size: 12.5px;
+  padding: 8px 0;
+  letter-spacing: .2px;
+  overflow: hidden;
+}
+.announcement-track {
+  display: flex;
+  width: max-content;
+  animation: announcement-scroll 34s linear infinite;
+}
+.announcement-run { display: flex; }
+.announcement-item {
+  position: relative;
+  padding: 0 46px;
+  white-space: nowrap;
+}
+/* Diamond between offers, including across the seam between the two runs. */
+.announcement-item::after {
+  content: '◆';
+  position: absolute;
+  right: -5px;
+  font-size: 7px;
+  color: rgba(255, 255, 255, .5);
+}
+/* Exactly one run's width, so the second run lands where the first began. */
+@keyframes announcement-scroll {
+  to { transform: translateX(-50%); }
+}
+.announcement:hover .announcement-track { animation-play-state: paused; }
+
+/* ---------- Header ---------- */
+/* Announcement + nav are pinned to the top for the whole page. Being fixed puts
+   them outside the document flow, so the bar can resize on scroll without ever
+   moving the page behind it; .site-head-spacer reserves the room instead. */
+.site-head { position: fixed; top: 0; left: 0; right: 0; z-index: 50; }
+.site-head-spacer { height: var(--header-h); }
+.header {
+  /* Not plain white — a light wash of the logo's rose, so the bar sits in the
+     same family as the crest and the crimson announcement above it. */
+  background: var(--head-tint);
+  border-bottom: 1px solid var(--line);
+  transition: box-shadow .25s ease;
+}
+/* Lifts off the page once it starts scrolling underneath. */
+.header.solid { box-shadow: 0 2px 14px rgba(143, 17, 25, .08); }
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  /* Full-bleed so the logo sits in the top-left corner of the page. */
+  padding: 6px 28px;
+  max-width: none;
+  margin: 0;
+}
+.logo { display: block; user-select: none; flex: none; }
+/* The bar holds nothing taller than this logo, so its height is the logo plus
+   the 6px of padding above and below. The asset is tightly cropped, so the full
+   height is mark — keep in sync with brand.logo in content.json. */
+.logo img { height: 78px; width: auto; transition: height .25s ease; }
+.header.solid .logo img { height: 50px; }
+
+/* ---------- Nav ---------- */
+.nav { display: flex; align-items: center; gap: 34px; margin-left: auto; }
+.nav a {
+  position: relative;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--teal);
+  white-space: nowrap;
+  padding: 6px 0;
+  transition: color .2s ease;
+}
+/* Underline grows from the centre on hover and for the section in view. */
+.nav a::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .28s cubic-bezier(.4, 0, .2, 1);
+}
+.nav a:hover::after, .nav a.active::after { transform: scaleX(1); }
+.nav a:hover { color: var(--gold-dark); }
+.nav a.active { color: var(--gold-dark); }
+/* The bar is white in both states now, so the links need no halo of their own. */
+
+/* ---------- Hero ---------- */
+/* Starts below the fixed head — the spacer above it reserves that room. */
+.hero { position: relative; background: #faf2f2; }
+.hero-track { display: flex; overflow: hidden; }
+.hero-slide { min-width: 100%; position: relative; }
+.hero-slide img { width: 100%; height: auto; display: block; }
+/* Video hero. The box is pinned to the banner ratio so a clip of any shape
+   fills it without changing the section height the header sits over. */
+.hero-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #faf2f2;
+}
+.hero-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(255,255,255,.65); border: none; color: var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; z-index: 3;
+}
+.hero-arrow:hover { background: #fff; }
+.hero-arrow.prev { left: 18px; }
+.hero-arrow.next { right: 18px; }
+.dots { position: absolute; bottom: 16px; left: 0; right: 0; display: flex; gap: 8px; justify-content: center; z-index: 3; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.6); border: none; padding: 0; }
+.dot.active { background: var(--gold); }
+
+/* ---------- What sets us apart (USP) ---------- */
+.usp {
+  background: var(--teal);
+  color: #fff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  /* A true gold, scoped to this section. The site-wide --gold is the logo's
+     rose, which all but disappears against the crimson band. */
+  --leaf: #e8bd63;
+  --leaf-pale: #fbe9b6;
+  --leaf-deep: #c9922f;
+}
+/* Each half carries the texture of what it argues for: fine white sugar grains
+   on the left, soft gold pools of ghee on the right. Gradients rather than
+   images — nothing to download, and sharp at any size. Both fade out towards
+   the middle so the scales sit on clean crimson. */
+.usp::before,
+.usp::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 44%;
+  z-index: -1;
+  pointer-events: none;
+}
+.usp::before {
+  left: 0;
+  background-image:
+    radial-gradient(circle at 22% 28%, rgba(255, 255, 255, .55) 0 1.5px, transparent 1.7px),
+    radial-gradient(circle at 68% 62%, rgba(255, 255, 255, .40) 0 1.1px, transparent 1.3px),
+    radial-gradient(circle at 45% 88%, rgba(255, 255, 255, .50) 0 1.8px, transparent 2px),
+    radial-gradient(circle at 85% 15%, rgba(255, 255, 255, .35) 0 1.2px, transparent 1.4px);
+  background-size: 118px 118px, 87px 87px, 152px 152px, 64px 64px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0 40%, transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0 40%, transparent 100%);
+}
+.usp::after {
+  right: 0;
+  background-image:
+    radial-gradient(circle at 30% 26%, rgba(232, 189, 99, .30) 0 7px, transparent 8.5px),
+    radial-gradient(circle at 74% 66%, rgba(232, 189, 99, .22) 0 11px, transparent 13px),
+    radial-gradient(circle at 52% 90%, rgba(232, 189, 99, .26) 0 5px, transparent 6.5px),
+    radial-gradient(circle at 12% 74%, rgba(232, 189, 99, .18) 0 9px, transparent 11px);
+  background-size: 186px 186px, 242px 242px, 138px 138px, 208px 208px;
+  -webkit-mask-image: linear-gradient(270deg, #000 0 40%, transparent 100%);
+  mask-image: linear-gradient(270deg, #000 0 40%, transparent 100%);
+}
+/* The two motifs sit in the outer margins, behind the copy and well clear of
+   the scales. Sunk deep enough to read as wallpaper rather than illustration. */
+.usp-art {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: -1;
+  pointer-events: none;
+  height: auto;
+}
+.usp-art-sugar { left: 2.5%; width: clamp(120px, 13vw, 210px); color: rgba(255, 255, 255, .18); }
+.usp-art-ghee { right: 3%; width: clamp(90px, 9vw, 140px); color: rgba(232, 189, 99, .3); }
+/* Below this the columns collapse and the motifs would land under the text. */
+@media (max-width: 1200px) {
+  .usp-art { display: none; }
+}
+.usp .section-head { margin-bottom: 26px; }
+.usp .section-head h2 { color: #fff; }
+/* Gold leaf lettering between two tapering rules. */
+.usp-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  font-size: 12px; font-weight: 700; letter-spacing: 3.4px; text-transform: uppercase;
+  color: var(--leaf);
+}
+/* Only knock the fill out where the gradient can actually clip to the glyphs —
+   otherwise the label would render invisible. */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .usp-kicker {
+    background: linear-gradient(180deg, var(--leaf-pale) 0%, var(--leaf) 48%, var(--leaf-deep) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+.usp-kicker::before,
+.usp-kicker::after {
+  content: '';
+  width: 52px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--leaf));
+}
+.usp-kicker::after { transform: scaleX(-1); }
+/* Claim / scales / claim. The two sides lean in towards the pans they name. */
+.usp-balance {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 22px;
+  align-items: center;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+/* Each side is held to one measure and pushed up against the scales, so the two
+   blocks mirror each other instead of straggling across the full column. */
+.usp-side { max-width: 400px; }
+.usp-side h3 {
+  font-size: 24px; color: var(--leaf); margin-bottom: 10px;
+  text-transform: uppercase; letter-spacing: 1.5px;
+}
+.usp-side p {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, .95);
+  margin: 0;
+}
+.usp-balance .usp-side:first-child { justify-self: end; text-align: right; }
+.usp-balance .usp-side:last-child { justify-self: start; text-align: left; }
+/* The width lives on the drawing, not the column, so the column can widen for
+   the word beneath it instead of letting it spill out of a fixed 220px box. */
+.usp-scale { color: var(--leaf); }
+/* A soft glow so the hairline scales read as metal against the crimson. */
+.usp-scale svg {
+  width: 220px; max-width: 100%; height: auto; display: block; margin: 0 auto;
+  filter: drop-shadow(0 0 6px rgba(232, 189, 99, .35));
+}
+/* Set in the sans at wide tracking, not the serif — as a serif at this size it
+   read as a second headline and out-shouted the section title above it. The
+   gold-leaf gradient is the same one the kicker uses, so the two bookend the
+   section. text-indent offsets the trailing letter-space, which would otherwise
+   pull the word off centre. */
+.usp-scale-word {
+  display: block;
+  font-family: var(--sans);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 9px;
+  text-indent: 9px;
+  text-transform: uppercase;
+  /* Kept on one line — it would otherwise break inside the scale column. */
+  white-space: nowrap;
+  color: var(--leaf-pale);
+  margin-top: 16px;
+  transform-origin: center;
+  /* Same 7s cycle as the beam, peaking as the scales settle level. */
+  animation: usp-word 7s ease-in-out infinite;
+}
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .usp-scale-word {
+    background: linear-gradient(180deg, var(--leaf-pale) 0%, var(--leaf) 55%, var(--leaf-deep) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+@keyframes usp-word {
+  0%, 70% { transform: scale(1); opacity: .8; }
+  84%     { transform: scale(1.18); opacity: 1; }
+  100%    { transform: scale(1); opacity: .92; }
+}
+
+/* Sugar and ghee pouring into the pans. */
+.usp-grain {
+  transform-box: view-box;
+  animation: usp-pour 2.7s cubic-bezier(.4, 0, .9, .6) infinite;
+}
+.usp-grain-sugar { fill: #fff; stroke: none; }
+.usp-grain-ghee { fill: var(--leaf); stroke: none; }
+@keyframes usp-pour {
+  0%        { transform: translateY(0); opacity: 0; }
+  14%       { opacity: 1; }
+  76%       { opacity: 1; }
+  100%      { transform: translateY(58px); opacity: 0; }
+}
+/* The beam tips each way, settles level, and holds there before going again —
+   the balance is the point, so level is where it rests. */
+@keyframes usp-tip {
+  0%, 6%    { transform: rotate(0deg); }
+  16%       { transform: rotate(-6.5deg); }
+  30%       { transform: rotate(0deg); }
+  42%       { transform: rotate(6.5deg); }
+  56%       { transform: rotate(0deg); }
+  64%       { transform: rotate(-2.6deg); }
+  72%       { transform: rotate(1.4deg); }
+  80%, 100% { transform: rotate(0deg); }
+}
+/* Same curve inverted, so the pans hang level throughout. */
+@keyframes usp-tip-counter {
+  0%, 6%    { transform: rotate(0deg); }
+  16%       { transform: rotate(6.5deg); }
+  30%       { transform: rotate(0deg); }
+  42%       { transform: rotate(-6.5deg); }
+  56%       { transform: rotate(0deg); }
+  64%       { transform: rotate(2.6deg); }
+  72%       { transform: rotate(-1.4deg); }
+  80%, 100% { transform: rotate(0deg); }
+}
+.usp-beam,
+.usp-pan { transform-box: view-box; }
+.usp-beam {
+  transform-origin: 120px 46px;
+  animation: usp-tip 7s cubic-bezier(.37, 0, .32, 1) infinite;
+}
+/* Shared timing and easing keep each pan exactly opposite its beam. */
+.usp-pan { animation: usp-tip-counter 7s cubic-bezier(.37, 0, .32, 1) infinite; }
+.usp-pan-l { transform-origin: 30px 46px; }
+.usp-pan-r { transform-origin: 210px 46px; }
+/* The affordability claim, weighed against itself. */
+.usp-claim {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 18px;
+  margin-top: 40px;
+  font-family: var(--serif); font-size: 21px; color: #fff;
+}
+.usp-claim-orn { color: var(--leaf); font-size: 13px; }
+.usp-note {
+  max-width: 640px; margin: 14px auto 0;
+  font-size: 14.5px; font-weight: 600; line-height: 1.7;
+  color: rgba(255, 255, 255, .9);
+}
+
+/* ---------- Generic carousel row ---------- */
+section { padding: 56px 0; }
+.carousel { position: relative; }
+.carousel-row {
+  display: flex; gap: 22px; overflow-x: auto; scroll-behavior: smooth;
+  padding: 6px 2px 10px; scrollbar-width: none;
+}
+.carousel-row::-webkit-scrollbar { display: none; }
+/* Auto-scrolling rows drive scrollLeft frame by frame, so the CSS smoothing
+   (which is for the arrow buttons) has to be off here. */
+/* No arrows and no hand-scrolling on an auto row — the drift is the only movement. */
+.carousel-row.auto { scroll-behavior: auto; overflow-x: hidden; touch-action: pan-y; }
+/* The looping copy of the cards takes part in the same flex row. */
+.carousel-clone { display: contents; }
+.c-arrow {
+  position: absolute; top: 42%; transform: translateY(-50%);
+  width: 34px; height: 34px; border-radius: 50%;
+  background: #fff; border: 1px solid #eddede; color: var(--teal);
+  display: flex; align-items: center; justify-content: center; font-size: 18px; z-index: 4;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08);
+}
+.c-arrow.prev { left: -6px; }
+.c-arrow.next { right: -6px; }
+.on-teal .c-arrow { background: rgba(255,255,255,.9); }
+
+/* ---------- Best seller / product card ---------- */
+.prod-card {
+  min-width: 250px; flex: 0 0 250px;
+  background: #fff; border: 1px solid var(--line); border-radius: 8px;
+  overflow: hidden; position: relative; text-align: center;
+  display: flex; flex-direction: column;
+}
+.prod-media { position: relative; padding: 22px 22px 8px; background: #fdf6f6; }
+.prod-media img { width: 100%; aspect-ratio: 1/1; object-fit: contain; }
+.ribbon {
+  position: absolute; top: 12px; left: 0;
+  background: var(--gold); color: #fff; font-size: 9.5px; font-weight: 700;
+  letter-spacing: .8px; padding: 4px 12px 4px 10px; border-radius: 0 3px 3px 0;
+  text-transform: uppercase;
+}
+.prod-body { padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.prod-body h3 { font-size: 17px; color: var(--gold); }
+/* Was 12.5px of --muted grey, which was too faint to read on the card. Darker
+   ink, heavier weight and a touch more size and leading. */
+.prod-body p {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* ---------- Dry fruit banner ---------- */
+/* Assembled rather than flat: `dryfruit-plate` is the backdrop with the bowls
+   lifted out of it, and each bowl is a transparent cutout floating above. The
+   cast shadows stay painted on the plate, so a bowl rising lifts away from its
+   own shadow. */
+.dryfruit { padding: 0; position: relative; overflow: hidden; }
+.dryfruit-plate { width: 100%; display: block; }
+/* Percentage translate is relative to the bowl's own height, so the drift keeps
+   its proportion at every screen width. */
+@keyframes dryfruit-float {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(0, -3.4%, 0); }
+}
+.dryfruit-bowl {
+  position: absolute;
+  height: auto;
+  will-change: transform;
+  /* Each bowl runs a little slower than the one before and starts part-way in,
+     so they never bob in unison. */
+  animation: dryfruit-float calc(4.6s + var(--i) * .55s) ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -1.15s);
+}
+.dryfruit-copy {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: center;
+  padding-left: 7%; max-width: 46%;
+  color: #fff; font-family: var(--serif); line-height: 1.15;
+}
+.dryfruit-copy .line-sm { font-size: clamp(13px, 1.7vw, 30px); }
+.dryfruit-copy .line-lg { font-size: clamp(22px, 3.4vw, 58px); margin: .12em 0; }
+/* Each line arrives a beat after the one above it. */
+@keyframes dryfruit-rise {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+/* Driven by the banner's own position in the viewport, so it plays on scroll
+   without any JavaScript. Where that is unsupported the copy just sits still. */
+@supports (animation-timeline: view()) {
+  .dryfruit-copy > span {
+    animation: dryfruit-rise linear both;
+    animation-timeline: view();
+  }
+  .dryfruit-copy > span:nth-child(1) { animation-range: entry 12% entry 62%; }
+  .dryfruit-copy > span:nth-child(2) { animation-range: entry 20% entry 74%; }
+  .dryfruit-copy > span:nth-child(3) { animation-range: entry 28% entry 86%; }
+}
+
+/* ---------- Curated / Traditional trio ---------- */
+/* Three arched "shrine" cards. The heading is fixed; the product inside each
+   card swaps every few seconds (timer lives in App.jsx). */
+.curated { background: var(--cream); }
+/* The cream tint paints over the page-wide wallpaper layer, so these two bands
+   carry their own copy of it. `fixed` attachment anchors the pattern to the
+   viewport exactly as the page layer does, so the two stay in step and the
+   motifs run continuously across the edge between a tinted band and a white one.
+   The negative z-index sits it above the section's own tint, below its content. */
+.curated, .collection { position: relative; isolation: isolate; }
+.curated::before, .collection::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--wallpaper) repeat fixed;
+  background-size: var(--wallpaper-size);
+  opacity: var(--wallpaper-opacity);
+}
+.trad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; margin-top: 6px; }
+
+.trad-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 190px 190px 14px 14px; /* domed top, like a temple arch */
+  padding: 30px 26px 26px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  box-shadow: 0 12px 30px rgba(143, 17, 25, .07);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+/* Rose hairline that traces the arch just inside the border. */
+.trad-card::before {
+  content: '';
+  position: absolute; inset: 7px;
+  border: 1px solid rgba(192, 72, 84, .32);
+  border-radius: 184px 184px 9px 9px;
+  pointer-events: none;
+}
+.trad-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(143, 17, 25, .14); }
+
+/* Medallion holding the rotating product shot. */
+.trad-media {
+  position: relative;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 38%, #fffdfd 0%, #fdf3f3 72%, #f8eaea 100%);
+}
+/* Rose rim drawn over the photo, so the crop can run right to the edge. */
+.trad-media::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(192, 72, 84, .45);
+  pointer-events: none;
+}
+/* Filled circular crop — the photo fills the whole medallion. Never scales
+   below 1 or a gap opens at the rim. */
+.trad-media img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0; transform: scale(1.07);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.trad-media img.on { opacity: 1; transform: scale(1); }
+
+.trad-kicker {
+  margin-top: 16px;
+  font-size: 9.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gold-dark);
+  background: #fdf1f2; border: 1px solid rgba(192, 72, 84, .35);
+  border-radius: 999px; padding: 4px 12px;
+}
+.trad-card h3 {
+  margin-top: 12px;
+  font-size: 21px; letter-spacing: .4px; color: var(--teal);
+}
+/* Diamond flanked by two rules — the section's little signature. */
+.trad-orn {
+  display: flex; align-items: center; gap: 10px;
+  margin: 10px 0 4px;
+  color: var(--gold); font-size: 7px;
+}
+.trad-orn::before, .trad-orn::after {
+  content: ''; width: 34px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(192, 72, 84, .75));
+}
+.trad-orn::after { transform: rotate(180deg); }
+
+/* Swapping copy — re-keyed on every change so the fade-up replays. */
+.trad-swap { min-height: 116px; animation: tradIn .55s ease both; }
+.trad-swap h4 {
+  font-size: 13px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase;
+  color: var(--gold);
+}
+.trad-swap p { font-size: 12.8px; line-height: 1.65; color: var(--muted); margin: 8px 0 0; }
+@keyframes tradIn {
+  from { opacity: 0; transform: translateY(9px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.trad-dots { display: flex; gap: 9px; margin-top: auto; padding-top: 6px; }
+.trad-dots button {
+  width: 8px; height: 8px; padding: 0;
+  border: 1px solid var(--gold); border-radius: 1px; background: transparent;
+  transform: rotate(45deg); /* diamonds, not dots */
+  transition: background .25s ease, transform .25s ease;
+}
+.trad-dots button.on { background: var(--gold); transform: rotate(45deg) scale(1.25); }
+
+@media (prefers-reduced-motion: reduce) {
+  .trad-card, .trad-media img, .trad-dots button { transition: none; }
+  .trad-media img { transform: scale(1); }
+  .trad-swap { animation: none; }
+  /* Scales rest level, nothing pours, and the word simply sits there. */
+  .usp-beam, .usp-pan, .usp-scale-word { animation: none; }
+  .usp-grain { display: none; }
+  /* Bowls rest in place and the copy is simply present. */
+  .dryfruit-bowl { animation: none; }
+  .dryfruit-copy > span { animation: none; opacity: 1; transform: none; }
+  /* Offers sit still and wrap instead of scrolling past. */
+  .announcement-track { animation: none; width: 100%; justify-content: center; }
+  .announcement-run { flex-wrap: wrap; justify-content: center; }
+  .announcement-run + .announcement-run { display: none; }
+  .announcement-item::after { content: none; }
+}
+
+/* ---------- Sweets collection ---------- */
+.collection { background: var(--cream); }
+.tabs { display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin: 4px 0 8px; }
+.tab {
+  background: none; border: none; font-size: 13px; font-weight: 700; letter-spacing: .5px;
+  color: var(--teal); padding: 6px 2px; border-bottom: 2px solid transparent;
+}
+.tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+/* Column count follows the width rather than being fixed at three, so the grid
+   fills a wide screen instead of leaving a 900px column in the middle of it. */
+.coll-grid {
+  display: grid;
+  /* min() keeps the track from being forced wider than its container on very
+     narrow screens, which would push the grid past the viewport. */
+  grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+  gap: 26px;
+  margin: 34px auto 0;
+  align-items: start;
+}
+/* Grid items default to min-width:auto, so anything with a wide min-content
+   size (a long unbroken name, an image reporting its intrinsic width) pushes
+   the track past its share and spills over the next column. */
+.coll-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.05);
+  overflow: hidden;
+  min-width: 0;
+}
+.coll-card h3 { overflow-wrap: anywhere; }
+
+/* ---- Overlapping stack ----
+   The cards are pulled into each other and every other column is dropped, so
+   the grid reads as a layered spread rather than a row of tiles. The white ring
+   keeps each card's edge legible where it crosses its neighbour. */
+.coll-stack {
+  gap: 0;
+  /* Offsets the cards' negative margins so the outer ones stay inside the
+     container, and leaves room for the drop of the staggered column. */
+  padding: 16px 18px 44px;
+}
+.coll-stack .coll-card {
+  --y: 0px;
+  position: relative;
+  z-index: var(--z, 1);
+  margin: -16px -18px;
+  transform: translateY(var(--y));
+  box-shadow: 0 0 0 4px #fff, 0 16px 34px rgba(143, 17, 25, .16);
+  transition: transform .3s cubic-bezier(.3, .7, .3, 1), box-shadow .3s ease;
+}
+/* Every second card sits lower, so the seam between them is a diagonal. */
+.coll-stack .coll-card:nth-child(even) { --y: 26px; }
+/* Lift clear of the stack — above every sibling, whatever its own order. */
+.coll-stack .coll-card:hover,
+.coll-stack .coll-card:focus-within {
+  z-index: 50;
+  transform: translateY(calc(var(--y) - 16px)) scale(1.035);
+  box-shadow: 0 0 0 4px #fff, 0 26px 54px rgba(143, 17, 25, .28);
+}
+/* Has to sit after the rules above, not in the block further up the file — the
+   selectors are identical, so source order decides which one wins. The card
+   still comes to the front, it just does not travel to get there. */
+@media (prefers-reduced-motion: reduce) {
+  .coll-stack .coll-card { transition: none; }
+  .coll-stack .coll-card:hover,
+  .coll-stack .coll-card:focus-within {
+    transform: translateY(var(--y));
+    box-shadow: 0 0 0 4px #fff, 0 26px 54px rgba(143, 17, 25, .28);
+  }
+}
+.coll-card .img-wrap { background: #fdf6f6; padding: 18px; }
+.coll-card img { width: 100%; aspect-ratio: 1.15/1; object-fit: contain; }
+.coll-card h3 { font-size: 18px; color: var(--teal); text-align: center; padding: 16px 12px 20px; }
+
+/* ---------- Visit us ---------- */
+/* Transparent rather than #fff so the wallpaper reads through this section too. */
+.available { background: transparent; text-align: center; }
+/* Address card beside a live Google map embed. */
+.visit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+  gap: 28px;
+  align-items: stretch;
+  text-align: left;
+  margin-top: 34px;
+}
+.visit-card {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+.visit-card h3 { font-size: 22px; color: var(--gold); }
+.visit-card address {
+  font-style: normal;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 0;
+}
+.visit-directions {
+  margin-top: auto;
+  background: var(--teal);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  border-radius: 4px;
+  transition: background .2s ease;
+}
+.visit-directions:hover { background: var(--teal-dark); }
+.visit-map {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: 320px;
+}
+/* The iframe has no intrinsic size, so it has to be stretched to the box. */
+.visit-map iframe { display: block; width: 100%; height: 100%; min-height: 320px; border: 0; }
+
+/* ---------- Testimonials ---------- */
+.testimonials { background: var(--teal); }
+/* White, not the logo rose — that reads as barely a shade off the crimson. */
+.testimonials .section-head h2 { color: #fff; }
+.testi-card {
+  min-width: 320px; flex: 0 0 320px; background: #a3161f;
+  border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 24px;
+  color: #fdeeee; display: flex; flex-direction: column; gap: 14px;
+}
+/* Rose is too close to the crimson band — the stars and avatar go pale here. */
+.testi-stars { color: #f0b9be; font-size: 15px; letter-spacing: 2px; }
+.testi-card p { font-size: 13px; line-height: 1.6; margin: 0; color: rgba(255,255,255,.85); flex: 1; }
+.testi-user { display: flex; align-items: center; gap: 12px; }
+.testi-avatar { width: 40px; height: 40px; border-radius: 50%; background: #fff; color: var(--teal); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 18px; }
+.testi-user strong { font-size: 14px; color: #fff; font-weight: 600; }
+
+/* ---------- Footer ---------- */
+.footer { background: var(--cream); padding: 50px 0 22px; color: var(--teal); }
+.footer-top { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 30px; padding-bottom: 34px; border-bottom: 1px solid var(--line); }
+.footer .brand-block .brand { font-family: var(--serif); font-size: 30px; color: var(--teal); }
+.footer .brand-block .tagline { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-top: 2px; }
+.footer .phones { margin: 18px 0; font-size: 13px; line-height: 1.9; color: var(--muted); }
+.footer .follow { font-size: 12px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px; }
+.footer .socials { display: flex; gap: 12px; }
+.footer .socials a { width: 30px; height: 30px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; }
+.footer .socials img { width: 14px; filter: brightness(0) invert(1); }
+.footer-col h4 { font-size: 0; } /* spacer, columns are plain link lists */
+.footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.footer-col a { font-size: 12.5px; font-weight: 600; letter-spacing: .4px; color: var(--teal); }
+.footer-col a:hover { color: var(--gold); }
+.footer-contact { margin-top: 8px; }
+.footer-contact .lbl { font-size: 12px; color: var(--muted); }
+.footer-contact .num { font-size: 14px; color: var(--teal); font-weight: 700; }
+.footer-bottom { text-align: center; font-size: 11.5px; color: var(--muted); padding-top: 22px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1080px) {
+  .nav { gap: 22px; }
+  .nav a { font-size: 11px; letter-spacing: 1px; }
+}
+@media (max-width: 900px) {
+  /* Stacked bar: logo above the links, which scroll sideways rather than wrap. */
+  .header-inner { flex-direction: column; gap: 10px; padding: 12px 16px; }
+  .nav {
+    margin-left: 0;
+    width: 100%;
+    gap: 20px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .logo img, .header.solid .logo img { height: 95px; }
+  /* .coll-grid needs no override — auto-fill drops its own columns. */
+  .visit-grid { grid-template-columns: 1fr; }
+  /* Scales on top, the two claims stacked beneath them. */
+  .usp-balance { grid-template-columns: 1fr; gap: 26px; }
+  .usp-scale { order: -1; margin: 0 auto; }
+  .usp-balance .usp-side:first-child,
+  .usp-balance .usp-side:last-child { text-align: center; }
+  .trad-grid { grid-template-columns: 1fr; max-width: 400px; margin-inline: auto; }
+  .footer-top { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .section-head h2 { font-size: 24px; }
+  .trad-media { width: 168px; height: 168px; }
+  .trad-swap { min-height: 0; }
+  .footer-top { grid-template-columns: 1fr; }
+  .hero-arrow { display: none; }
+}

@@ -1,0 +1,124 @@
+/* ============================================================================
+   CORPORATE GIFTING PAGE  — reuses the site palette (index.css :root tokens).
+   ============================================================================ */
+
+:root { --wa: #1fa855; --wa-dark: #17913f; }
+
+/* ---- intro ---- */
+.corp-hero {
+  background: linear-gradient(160deg, var(--teal), var(--teal-dark));
+  color: #fff;
+  /* The head is fixed and its spacer already clears it, so this is plain padding. */
+  padding: 56px 0;
+  text-align: center;
+}
+.corp-kicker {
+  display: inline-block;
+  font-size: 12.5px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 14px;
+}
+.corp-hero h1 {
+  font-family: var(--serif); font-size: 42px; margin: 0 0 14px; color: #fff;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.corp-hero p { max-width: 640px; margin: 0 auto; font-size: 15.5px; color: rgba(255,255,255,.85); line-height: 1.6; }
+.corp-hero-actions { margin-top: 26px; }
+.btn-teal {
+  display: inline-block; background: var(--gold); color: #ffffff;
+  padding: 12px 24px; border-radius: 999px; font-weight: 700; font-size: 14px;
+}
+.btn-teal:hover { background: var(--gold-dark); }
+
+/* ---- packs grid ---- */
+.corp-packs { padding: 56px 0; background: var(--cream); }
+.corp-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px;
+}
+.pack-card {
+  background: #fff; border: 1px solid #f0e4e4;
+  border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0,0,0,.05);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.pack-card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px rgba(0,0,0,.10); }
+/* Square to match the pack artwork, and `contain` so nothing is ever cropped —
+   a 4/3 box with `cover` was slicing the top and bottom off every image. Any
+   pack that is not square just letterboxes onto the cream behind it. */
+.pack-media { aspect-ratio: 1 / 1; background: #faf2f2; display: grid; place-items: center; overflow: hidden; }
+.pack-media img { width: 100%; height: 100%; object-fit: contain; }
+.pack-noimg { font-size: 12px; color: var(--muted); }
+.pack-body { padding: 18px 16px 20px; display: flex; flex-direction: column; flex: 1; }
+.pack-body h3 { font-family: var(--serif); color: var(--teal); font-size: 20px; margin: 0 0 6px; }
+.pack-desc { font-size: 13.5px; color: var(--muted); line-height: 1.5; margin: 0 0 16px; min-height: 42px; }
+.pack-qty-label { font-size: 11.5px; text-transform: uppercase; letter-spacing: .6px; color: #7a4a4a; margin-bottom: 6px; }
+
+/* quantity stepper */
+.qty { display: inline-flex; align-items: stretch; border: 1px solid #ecdede; border-radius: 10px; overflow: hidden; width: max-content; }
+.qty button {
+  width: 38px; background: #faf2f2; border: 0; font-size: 20px; color: var(--teal); line-height: 1;
+}
+.qty button:hover { background: #f4e6e6; }
+.qty input {
+  width: 58px; text-align: center; border: 0; border-left: 1px solid #ecdede; border-right: 1px solid #ecdede;
+  font-size: 15px; font-family: var(--sans); color: var(--ink); background: #fff; -moz-appearance: textfield;
+}
+.qty input::-webkit-outer-spin-button, .qty input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.pack-actions { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+
+/* buttons */
+.btn-wa {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--wa); color: #fff; border: 0; border-radius: 10px;
+  padding: 11px 14px; font-size: 14px; font-weight: 600; font-family: var(--sans);
+}
+.btn-wa:hover { background: var(--wa-dark); }
+.btn-wa.lg { padding: 14px 20px; font-size: 16px; width: 100%; margin-top: 6px; }
+.btn-outline {
+  background: #fff; color: var(--teal); border: 1px solid var(--teal);
+  border-radius: 10px; padding: 10px 14px; font-size: 13.5px; font-weight: 600; font-family: var(--sans);
+}
+.btn-outline:hover { background: #fdf2f2; }
+
+/* ---- enquiry form ---- */
+.corp-form-section { padding: 64px 0 80px; background: #fff; }
+.corp-form-section .section-head h2 { color: var(--teal); }
+.corp-warn {
+  max-width: 760px; margin: 0 auto 22px; background: #fdf1f2; border: 1px solid #f0c9cd;
+  color: #7a4a4a; border-radius: 10px; padding: 12px 16px; font-size: 13.5px; line-height: 1.55;
+}
+.corp-form { max-width: 760px; margin: 0 auto; }
+.corp-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+.cf { display: flex; flex-direction: column; margin-bottom: 14px; }
+.cf span { font-size: 12.5px; font-weight: 600; color: #4b3f3f; margin-bottom: 6px; }
+.cf input, .cf textarea {
+  padding: 11px 12px; font-size: 14.5px; font-family: var(--sans);
+  border: 1px solid #ecdede; border-radius: 10px; background: #fff; color: var(--ink);
+}
+.cf textarea { resize: vertical; line-height: 1.5; }
+.cf input:focus, .cf textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(143,17,25,.12); }
+
+.corp-lines { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+.corp-lines-head {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--teal); color: #fff; padding: 10px 16px; font-size: 12.5px;
+  text-transform: uppercase; letter-spacing: .6px;
+}
+.corp-line {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  padding: 14px 16px; border-top: 1px solid #f4e8e8;
+}
+.corp-line:first-of-type { border-top: 0; }
+.corp-line-name { display: flex; flex-direction: column; }
+.corp-line-name strong { font-size: 15px; color: var(--ink); }
+.corp-line-name em { font-style: normal; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.corp-summary { text-align: center; font-size: 13.5px; color: var(--teal); font-weight: 600; margin: 6px 0 4px; }
+
+/* ---- responsive ---- */
+@media (max-width: 980px) { .corp-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 620px) {
+  .corp-hero h1 { font-size: 32px; }
+  .corp-grid { grid-template-columns: 1fr; }
+  .corp-form-grid { grid-template-columns: 1fr; }
+  .corp-line { flex-wrap: wrap; }
+}

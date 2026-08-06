@@ -122,23 +122,32 @@
     var tabs = section.querySelectorAll('.tab')
     var cards = section.querySelectorAll('.coll-card')
     if (!tabs.length) return
+    function apply (want) {
+      var shown = 0
+      ;[].forEach.call(cards, function (card) {
+        var on = card.getAttribute('data-tab') === want
+        card.hidden = !on
+        if (!on) return
+        // Restack, so the overlap order still runs left to right.
+        card.style.setProperty('--z', ++shown)
+        // Stagger by position among the visible cards. The CSS nth-child rule
+        // counts the hidden ones too, which breaks the diagonal on every tab
+        // but the first.
+        card.style.setProperty('--y', shown % 2 === 0 ? '26px' : '0px')
+      })
+    }
     ;[].forEach.call(tabs, function (tab) {
       tab.addEventListener('click', function () {
-        var want = tab.getAttribute('data-tab')
         ;[].forEach.call(tabs, function (t) {
           var on = t === tab
           t.classList.toggle('active', on)
           t.setAttribute('aria-selected', on ? 'true' : 'false')
         })
-        var shown = 0
-        ;[].forEach.call(cards, function (card) {
-          var on = card.getAttribute('data-tab') === want
-          card.hidden = !on
-          // Restack, so the overlap order still runs left to right.
-          if (on) card.style.setProperty('--z', ++shown)
-        })
+        apply(tab.getAttribute('data-tab'))
       })
     })
+    var active = section.querySelector('.tab.active')
+    if (active) apply(active.getAttribute('data-tab'))
   })
 
   // ---- corporate gifting ---------------------------------------------------

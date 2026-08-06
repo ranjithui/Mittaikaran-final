@@ -697,22 +697,31 @@ section { padding: 56px 0; }
    the grid reads as a layered spread rather than a row of tiles. The white ring
    keeps each card's edge legible where it crosses its neighbour. */
 .coll-stack {
-  gap: 0;
-  /* Offsets the cards' negative margins so the outer ones stay inside the
+  column-gap: 0;
+  /* Cards overlap sideways only. The row gap has to clear the 26px drop of the
+     staggered column, otherwise the next row — which is later in source order
+     and so paints on top — covers the dropped card's title. */
+  row-gap: 44px;
+  /* Offsets the cards' negative side margins so the outer ones stay inside the
      container, and leaves room for the drop of the staggered column. */
-  padding: 16px 18px 44px;
+  padding: 6px 18px 34px;
 }
 .coll-stack .coll-card {
   --y: 0px;
   position: relative;
   z-index: var(--z, 1);
-  margin: -16px -18px;
+  margin: 0 -18px;
   transform: translateY(var(--y));
   box-shadow: 0 0 0 4px #fff, 0 16px 34px rgba(143, 17, 25, .16);
   transition: transform .3s cubic-bezier(.3, .7, .3, 1), box-shadow .3s ease;
 }
-/* Every second card sits lower, so the seam between them is a diagonal. */
+/* Every second card sits lower, so the seam between them is a diagonal. The
+   no-JS default counts every sibling; once a tab is applied the script sets --y
+   inline from the position among the *visible* cards instead. */
 .coll-stack .coll-card:nth-child(even) { --y: 26px; }
+/* Each card's right edge is tucked 36px under its right-hand neighbour, so the
+   title keeps clear of that band to stay readable end to end. */
+.coll-stack .coll-card h3 { padding-left: 44px; padding-right: 44px; }
 /* Lift clear of the stack — above every sibling, whatever its own order. */
 .coll-stack .coll-card:hover,
 .coll-stack .coll-card:focus-within {
@@ -808,18 +817,26 @@ section { padding: 56px 0; }
 .footer-top { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 30px; padding-bottom: 34px; border-bottom: 1px solid var(--line); }
 .footer .brand-block .brand { font-family: var(--serif); font-size: 30px; color: var(--teal); }
 .footer .brand-block .tagline { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-top: 2px; }
-.footer .phones { margin: 18px 0; font-size: 13px; line-height: 1.9; color: var(--muted); }
+.footer .footer-blurb { margin: 14px 0 0; max-width: 32ch; font-size: 13px; line-height: 1.7; color: var(--muted); }
+.footer .phones { margin: 14px 0 18px; font-size: 13px; line-height: 1.9; color: var(--muted); }
+.footer .phones a:hover { color: var(--gold); }
 .footer .follow { font-size: 12px; font-weight: 700; letter-spacing: 1px; margin-bottom: 10px; }
 .footer .socials { display: flex; gap: 12px; }
 .footer .socials a { width: 30px; height: 30px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; }
 .footer .socials img { width: 14px; filter: brightness(0) invert(1); }
-.footer-col h4 { font-size: 0; } /* spacer, columns are plain link lists */
+/* Column heading — same rhythm as .tagline so the four columns share a baseline. */
+.footer-col h4 { margin: 0 0 16px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
 .footer-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
 .footer-col a { font-size: 12.5px; font-weight: 600; letter-spacing: .4px; color: var(--teal); }
 .footer-col a:hover { color: var(--gold); }
-.footer-contact { margin-top: 8px; }
+.footer-col a[aria-current="page"] { color: var(--gold); }
+.footer-address { margin: 0 0 12px; font-style: normal; font-size: 13px; line-height: 1.8; color: var(--muted); }
+.footer-directions { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .4px; color: var(--gold); border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+.footer-directions:hover { color: var(--teal); }
+.footer-contact { margin-top: 20px; }
 .footer-contact .lbl { font-size: 12px; color: var(--muted); }
-.footer-contact .num { font-size: 14px; color: var(--teal); font-weight: 700; }
+.footer-contact .num { display: inline-block; font-size: 14px; color: var(--teal); font-weight: 700; }
+.footer-contact .num:hover { color: var(--gold); }
 .footer-bottom { text-align: center; font-size: 11.5px; color: var(--muted); padding-top: 22px; }
 
 /* ---------- Responsive ---------- */
